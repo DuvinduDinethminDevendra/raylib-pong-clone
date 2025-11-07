@@ -41,7 +41,7 @@ PROJECT_SOURCE_FILES  ?= \
     screen_ending.c
 
 # raylib library variables
-RAYLIB_SRC_PATH       ?= ../../raylib/src
+RAYLIB_SRC_PATH       ?= C:\raylib\raylib\src
 RAYLIB_INCLUDE_PATH   ?= $(RAYLIB_SRC_PATH)
 RAYLIB_LIB_PATH       ?= $(RAYLIB_SRC_PATH)
 
