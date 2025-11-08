@@ -57,26 +57,34 @@ cmake --build build
 
 - cmake will automatically download a current release of raylib but if you want to use your local version you can pass `-DFETCHCONTENT_SOURCE_DIR_RAYLIB=<dir_with_raylib>` 
 
-## $(Game Title)
+## My First Pong Game
 
-![$(Game Title)](screenshots/screenshot000.png "$(Game Title)")
+![My First Pong Game](screenshots/screenshot000.png "My First Pong Game")
 
 ### Description
 
-$(Your Game Description)
+A simple yet classic Pong clone created with raylib in plain C. This is a beginner-friendly implementation of the iconic arcade game, featuring two-player gameplay with responsive paddle controls and realistic ball physics. The game includes a menu system for selecting game modes and a complete game loop with collision detection and ball bounce mechanics.
 
 ### Features
 
- - $(Game Feature 01)
- - $(Game Feature 02)
- - $(Game Feature 03)
+ - Two-player gameplay (Player vs Player)
+ - Interactive menu system with selection indicator
+ - Smooth paddle controls with boundary detection
+ - Ball physics with wall and paddle collision
+ - Ball reset to center when out of bounds
+ - Menu navigation with keyboard and mouse wheel support
+ - Coming Soon: Player vs AI mode
 
 ### Controls
 
 Keyboard:
- - $(Game Control 01)
- - $(Game Control 02)
- - $(Game Control 03)
+ - **W / UP Arrow** - Move paddle up
+ - **S / DOWN Arrow** - Move paddle down
+ - **ENTER** - Confirm menu selection and start game
+ - **ESC** - Close game window
+
+Mouse:
+ - **Mouse Wheel** - Navigate menu options
 
 ### Screenshots
 
@@ -84,15 +92,12 @@ _TODO: Show your game to the world, animated GIFs recommended!._
 
 ### Developers
 
- - $(Developer 01) - $(Role/Tasks Developed)
- - $(Developer 02) - $(Role/Tasks Developed)
- - $(Developer 03) - $(Role/Tasks Developed)
+ - Duvindu Dinethmin Devendra - Game Development & Implementation
 
 ### Links
 
- - YouTube Gameplay: $(YouTube Link)
- - itch.io Release: $(itch.io Game Page)
- - Steam Release: $(Steam Game Page)
+ - itch.io Release: (Coming Soon)
+ - Steam Release: (Coming Soon)
 
 ### License
 

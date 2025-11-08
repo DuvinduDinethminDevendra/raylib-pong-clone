@@ -48,28 +48,46 @@ int main(void) {
 
     Vector2 ballSpeed = { 5.0f, 5.0f };  // Ball speed (pixels per frame)  // NOLINT
 
-
+    // selected option for menu
+    static int selectedOption = 0;
 
     SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
 
     // --- Main Game Loop ---
     // This loop runs 60 times a second, until you close the window
-    while (!WindowShouldClose())    // Detect window close button or ESC key
-    {  // NOLINT
+    while (!WindowShouldClose()) {    // Detect window close button or ESC key  // NOLINT
     // ----------------------------------------------------------------------------------
     // --- Update ---
     // This is where all your game logic (movement, input, collision) will go
     // ----------------------------------------------------------------------------------
     // Ball radius defined above
     // paddle speed
-        float playerSpeed = 7.0f;   // NOLINT
-    switch (currentScreen)
-    {
+    float playerSpeed = 7.0f;   // NOLINT
+    switch (currentScreen) {  // NOLINT
         case SCREEN_MENU:
-            if (IsKeyPressed(KEY_ENTER))
             {
-                    currentScreen = SCREEN_GAMEPLAY;
-            }break;
+                // Toggle selection with arrow keys or mouse wheel
+                if (IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W)) {
+                    selectedOption = (selectedOption - 1 + 2) % 2;
+                }
+                if (IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_S)) {
+                    selectedOption = (selectedOption + 1) % 2;
+                }
+                int wheelMove = GetMouseWheelMove();
+                if (wheelMove != 0) {
+                    selectedOption = (selectedOption - wheelMove + 2) % 2;
+                }
+
+                // Select option with ENTER
+                if (IsKeyPressed(KEY_ENTER)) {
+                    if (selectedOption == 0) {
+                        currentScreen = SCREEN_GAMEPLAY;
+                    } else if (selectedOption == 1) {
+                        // Option 1 (AI) - coming soon
+                        currentScreen = ENDING;
+                    }
+                }
+            } break;
         case SCREEN_GAMEPLAY:
             // player 1 controls
             if (IsKeyDown(KEY_W) && player1.y > 0)
@@ -109,6 +127,14 @@ int main(void) {
                 ballPosition.y = screenHeight / 2.0f;
             }
             break;
+        case ENDING:
+            // Ending screen logic (if any)
+            DrawText("THANK YOU FOR PLAYING!", screenWidth / 2 - 100, screenHeight / 2 - 20, 20, LIGHTGRAY);
+            DrawText("PRESS ENTER TO RETURN TO MENU", screenWidth / 2 - 150, screenHeight / 2 + 10, 20, LIGHTGRAY);
+            if (IsKeyPressed(KEY_ENTER)) {
+                currentScreen = SCREEN_MENU;
+            }
+            break;
         default:
             break;
     }
@@ -120,13 +146,19 @@ int main(void) {
     // This is where you draw everything to the screen
     // ----------------------------------------------------------------------------------
         BeginDrawing();
-        ClearBackground(BLACK);
+            ClearBackground(BLACK);
 
-        switch (currentScreen)
-        {
+        switch (currentScreen) {  // NOLINT
             case SCREEN_MENU:
-                DrawText("MY PONG GAME", screenWidth / 2 - 100, screenHeight / 2 - 60, 40, LIGHTGRAY);
-                DrawText("PRESS ENTER TO START", screenWidth / 2 - 200, screenHeight / 2 - 20, 20, LIGHTGRAY);
+                DrawText("MY PONG GAME", screenWidth / 2 - 150, screenHeight / 2 - 80, 40, LIGHTGRAY);
+               // draw indicator - highlight the selected option
+                if (selectedOption == 0) {
+                    DrawText("1. Player vs Player", screenWidth / 2 - 100, screenHeight / 2 - 30, 15, YELLOW);
+                    DrawText("2. Player vs AI (Coming Soon)", screenWidth / 2 - 100, screenHeight / 2 - 10, 15, LIGHTGRAY);  // NOLINT
+                } else if (selectedOption == 1) {
+                    DrawText("1. Player vs Player", screenWidth / 2 - 100, screenHeight / 2 - 30, 15, LIGHTGRAY);
+                    DrawText("2. Player vs AI (Coming Soon)", screenWidth / 2 - 100, screenHeight / 2 - 10, 15, YELLOW);
+                }
                 DrawText("Created by Duvindu Dinethmin Devendra", screenWidth / 2 - 130, screenHeight - 40, 10, GRAY);
                 break;
             case SCREEN_GAMEPLAY:
@@ -136,6 +168,11 @@ int main(void) {
                 // Draw ball
                 DrawCircleV(ballPosition, ballRadius, WHITE);
                 break;
+            case ENDING:
+                DrawText("THANK YOU FOR PLAYING!", screenWidth / 2 - 100, screenHeight / 2 - 20, 20, LIGHTGRAY);
+                DrawText("PRESS ENTER TO RETURN TO MENU", screenWidth / 2 - 150, screenHeight / 2 + 10, 20, LIGHTGRAY);
+                break;
+
             default:
                 break;
         }
