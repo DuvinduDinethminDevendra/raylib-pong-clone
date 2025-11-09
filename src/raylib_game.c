@@ -9,6 +9,7 @@
  *
  ********************************************************************************************/
 #include "raylib.h"  // NOLINT
+#include <stdio.h>   // NOLINT
 
 // states
 typedef enum GameScreen {   // NOLINT
@@ -47,6 +48,11 @@ int main(void) {
     float ballRadius = 10.0f;  // Ball radius  // NOLINT
 
     Vector2 ballSpeed = { 5.0f, 5.0f };  // Ball speed (pixels per frame)  // NOLINT
+    Color ballColor = WHITE;  // Ball color (white)  // NOLINT
+
+    // Score tracking
+    int player1Score = 0;  // Player 1 (left paddle) score  // NOLINT
+    int player2Score = 0;  // Player 2 (right paddle) score  // NOLINT
 
     // selected option for menu
     static int selectedOption = 0;
@@ -82,6 +88,9 @@ int main(void) {
                 if (IsKeyPressed(KEY_ENTER)) {
                     if (selectedOption == 0) {
                         currentScreen = SCREEN_GAMEPLAY;
+                        // Reset scores for new game
+                        player1Score = 0;  // NOLINT
+                        player2Score = 0;  // NOLINT
                     } else if (selectedOption == 1) {
                         // Option 1 (AI) - coming soon
                         currentScreen = ENDING;
@@ -117,14 +126,24 @@ int main(void) {
             // ball bounce logic paddles
             if (CheckCollisionCircleRec(ballPosition, ballRadius, player1)) {
                 ballSpeed.x *= -1;  // Reverse horizontal direction
+                ballColor = YELLOW;  // Change ball color Player 2  // NOLINT
             }
             if (CheckCollisionCircleRec(ballPosition, ballRadius, player2)) {
                 ballSpeed.x *= -1;  // Reverse horizontal direction
+                ballColor = RED;  // Change ball color Player 1  // NOLINT
             }
             if (ballPosition.x < 0 || ballPosition.x > screenWidth) {
                 // Reset ball position to center
                 ballPosition.x = screenWidth / 2.0f;
                 ballPosition.y = screenHeight / 2.0f;
+                ballColor = WHITE;  // Reset ball color  // NOLINT
+
+                // Award points based on which side ball went out
+                if (ballPosition.x < 0) {
+                    player2Score++;  // Ball went left, player 2 scores  // NOLINT
+                } else {
+                    player1Score++;  // Ball went right, player 1 scores  // NOLINT
+                }
             }
             break;
         case ENDING:
@@ -163,10 +182,18 @@ int main(void) {
                 break;
             case SCREEN_GAMEPLAY:
                 // Draw paddles
-                DrawRectangleRec(player1, WHITE);
-                DrawRectangleRec(player2, WHITE);
+                DrawRectangleRec(player1, RED);
+                DrawRectangleRec(player2, YELLOW);
                 // Draw ball
-                DrawCircleV(ballPosition, ballRadius, WHITE);
+                DrawCircleV(ballPosition, ballRadius, ballColor);
+
+                // Draw score
+                char scoreText1[20];
+                char scoreText2[20];
+                sprintf(scoreText1, "Player 1: %d", player1Score);  // NOLINT
+                sprintf(scoreText2, "Player 2: %d", player2Score);  // NOLINT
+                DrawText(scoreText1, 20, 20, 20, RED);
+                DrawText(scoreText2, screenWidth - 180, 20, 20, YELLOW);
                 break;
             case ENDING:
                 DrawText("THANK YOU FOR PLAYING!", screenWidth / 2 - 100, screenHeight / 2 - 20, 20, LIGHTGRAY);
