@@ -59,7 +59,7 @@ cmake --build build
 
 ## My First Pong Game
 
-![My First Pong Game](screenshots/screenshot000.png "Paddle Battle")
+![My First Pong Game](screenshots/screenshot001.png "Paddle Battle")
 
 ### Description
 
