@@ -19,6 +19,35 @@ typedef enum GameScreen {   // NOLINT
     SCREEN_GAMEPLAY,
     ENDING } GameScreen;
 
+// Game modes
+typedef enum GameMode {  // NOLINT
+    PVP = 0,     // Player vs Player
+    PVAI = 1 }   // Player vs AI
+GameMode;
+
+//----------------------------------------------------------------------------------
+// AI Function - Makes the AI paddle track the ball
+//----------------------------------------------------------------------------------
+void UpdateAIPaddle(Rectangle *aiPaddle, Vector2 ballPosition, float aiSpeed,
+                    int screenHeight) {
+    float paddle_center = aiPaddle->y + aiPaddle->height / 2.0f;
+
+    // AI tries to center the paddle on the ball
+    if (paddle_center < ballPosition.y - 35.0f) {
+        aiPaddle->y += aiSpeed;  // Move paddle down  // NOLINT
+    } else if (paddle_center > ballPosition.y + 35.0f) {
+        aiPaddle->y -= aiSpeed;  // Move paddle up  // NOLINT
+    }
+
+    // Keep AI paddle inside the screen
+    if (aiPaddle->y < 0) {
+        aiPaddle->y = 0;
+    }
+    if ((aiPaddle->y + aiPaddle->height) > screenHeight) {
+        aiPaddle->y = screenHeight - aiPaddle->height;
+    }
+}
+
 //----------------------------------------------------------------------------------
 // Program main entry point
 //----------------------------------------------------------------------------------
@@ -28,7 +57,19 @@ int main(void) {
     const int screenHeight = 450;
     InitWindow(screenWidth, screenHeight, "My Pong Game");
 
+    // Initialize audio device
+    InitAudioDevice();  // NOLINT
+
+    // Load sound effects
+    Sound paddleHitSound = LoadSound("resources/paddle_hit.wav");  // NOLINT
+    Sound wallHitSound = LoadSound("resources/wall_hit.wav");  // NOLINT
+    Sound ballMissSound = LoadSound("resources/mixkit-funny-game-over-2878.wav");  // NOLINT
+    Sound pointMadeSound = LoadSound("resources/coin.wav");  // NOLINT
+
     GameScreen currentScreen = SCREEN_MENU;
+
+    // Game mode tracking
+    GameMode gameMode = PVP;  // Start with Player vs Player  // NOLINT
 
     Rectangle player1 = { 50, screenHeight/2 - 40, 10, 80 };  // Left paddle  // NOLINT
     player1.width = 20;
@@ -87,13 +128,17 @@ int main(void) {
                 // Select option with ENTER
                 if (IsKeyPressed(KEY_ENTER)) {
                     if (selectedOption == 0) {
+                        gameMode = PVP;  // Set to Player vs Player  // NOLINT
                         currentScreen = SCREEN_GAMEPLAY;
                         // Reset scores for new game
                         player1Score = 0;  // NOLINT
                         player2Score = 0;  // NOLINT
                     } else if (selectedOption == 1) {
-                        // Option 1 (AI) - coming soon
-                        currentScreen = ENDING;
+                        gameMode = PVAI;  // Set to Player vs AI  // NOLINT
+                        currentScreen = SCREEN_GAMEPLAY;
+                        // Reset scores for new game
+                        player1Score = 0;  // NOLINT
+                        player2Score = 0;  // NOLINT
                     }
                 }
             } break;
@@ -103,11 +148,18 @@ int main(void) {
                 player1.y -= playerSpeed;  // Move paddle up
             if (IsKeyDown(KEY_S) && (player1.y + player1.height) < screenHeight)
                 player1.y += playerSpeed;  // Move paddle down
-            // player 2 controls
-            if (IsKeyDown(KEY_UP) && player2.y > 0)
-                player2.y -= playerSpeed;  // Move paddle up
-            if (IsKeyDown(KEY_DOWN) && (player2.y + player2.height) < screenHeight)
-                player2.y += playerSpeed;  // Move paddle down
+            
+            // player 2 controls - depends on game mode
+            if (gameMode == PVP) {
+                // Player vs Player - human controls
+                if (IsKeyDown(KEY_UP) && player2.y > 0)
+                    player2.y -= playerSpeed;  // Move paddle up
+                if (IsKeyDown(KEY_DOWN) && (player2.y + player2.height) < screenHeight)
+                    player2.y += playerSpeed;  // Move paddle down
+            } else if (gameMode == PVAI) {
+                // Player vs AI - use AI logic
+                UpdateAIPaddle(&player2, ballPosition, playerSpeed, screenHeight);
+            }
 
             // keep paldles inside the screen
             if (player1.y < 0) player1.y = 0;
@@ -122,28 +174,38 @@ int main(void) {
             // ball bounce logic walls
             if (ballPosition.y > (screenHeight - ballRadius) || ballPosition.y < ballRadius) {
                 ballSpeed.y *= -1;  // Reverse vertical direction
+                PlaySound(wallHitSound);  // Play wall collision sound  // NOLINT
             }
             // ball bounce logic paddles
             if (CheckCollisionCircleRec(ballPosition, ballRadius, player1)) {
                 ballSpeed.x *= -1;  // Reverse horizontal direction
                 ballColor = YELLOW;  // Change ball color Player 2  // NOLINT
+                PlaySound(paddleHitSound);  // Play paddle collision sound  // NOLINT
             }
             if (CheckCollisionCircleRec(ballPosition, ballRadius, player2)) {
                 ballSpeed.x *= -1;  // Reverse horizontal direction
                 ballColor = RED;  // Change ball color Player 1  // NOLINT
+                PlaySound(paddleHitSound);  // Play paddle collision sound  // NOLINT
             }
             if (ballPosition.x < 0 || ballPosition.x > screenWidth) {
+                // Award points based on which side ball went out
+                if (ballPosition.x < 0) {
+                    PlaySound(ballMissSound);  // Play ball miss sound  // NOLINT
+                    WaitTime(0.7f);  // Brief pause after scoring  // NOLINT
+                    player2Score++;  // Ball went left, player 2 scores  // NOLINT
+                    PlaySound(pointMadeSound);  // Play point made sound  // NOLINT
+
+                } else {
+                    PlaySound(ballMissSound);  // Play ball miss sound  // NOLINT
+                    WaitTime(0.7f);  // Brief pause after scoring  // NOLINT
+                    player1Score++;  // Ball went right, player 1 scores  // NOLINT
+                    PlaySound(pointMadeSound);  // Play point made sound  // NOLINT
+                }
+
                 // Reset ball position to center
                 ballPosition.x = screenWidth / 2.0f;
                 ballPosition.y = screenHeight / 2.0f;
                 ballColor = WHITE;  // Reset ball color  // NOLINT
-
-                // Award points based on which side ball went out
-                if (ballPosition.x < 0) {
-                    player2Score++;  // Ball went left, player 2 scores  // NOLINT
-                } else {
-                    player1Score++;  // Ball went right, player 1 scores  // NOLINT
-                }
             }
             break;
         case ENDING:
@@ -173,10 +235,10 @@ int main(void) {
                // draw indicator - highlight the selected option
                 if (selectedOption == 0) {
                     DrawText("1. Player vs Player", screenWidth / 2 - 100, screenHeight / 2 - 30, 15, YELLOW);
-                    DrawText("2. Player vs AI (Coming Soon)", screenWidth / 2 - 100, screenHeight / 2 - 10, 15, LIGHTGRAY);  // NOLINT
+                    DrawText("2. Player vs AI", screenWidth / 2 - 100, screenHeight / 2 - 10, 15, LIGHTGRAY);
                 } else if (selectedOption == 1) {
                     DrawText("1. Player vs Player", screenWidth / 2 - 100, screenHeight / 2 - 30, 15, LIGHTGRAY);
-                    DrawText("2. Player vs AI (Coming Soon)", screenWidth / 2 - 100, screenHeight / 2 - 10, 15, YELLOW);
+                    DrawText("2. Player vs AI", screenWidth / 2 - 100, screenHeight / 2 - 10, 15, YELLOW);
                 }
                 DrawText("Created by Duvindu Dinethmin Devendra", screenWidth / 2 - 130, screenHeight - 40, 10, GRAY);
                 break;
@@ -211,6 +273,9 @@ int main(void) {
     }
 
     // --- De-Initialization ---
+    UnloadSound(paddleHitSound);  // Unload paddle hit sound  // NOLINT
+    UnloadSound(wallHitSound);    // Unload wall hit sound  // NOLINT
+    CloseAudioDevice();           // Close audio device  // NOLINT
     CloseWindow();        // Close window and OpenGL context
 
     return 0;
