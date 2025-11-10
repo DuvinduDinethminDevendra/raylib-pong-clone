@@ -16,6 +16,7 @@ typedef enum GameScreen {   // NOLINT
     SCREEN_LOADING = 0,
     SCREEN_MENU,
     SCREEN_GAMEPLAY,
+    SCREEN_PAUSE,
     SCREEN_ENDING } GameScreen;
 
 // Game modes
@@ -52,8 +53,12 @@ void UpdateAIPaddle(Rectangle *aiPaddle, Vector2 ballPosition, float aiSpeed,
 //----------------------------------------------------------------------------------
 int main(void) {
     // --- Initialization ---
-    const int screenWidth = 800;
-    const int screenHeight = 450;
+    const int screenWidth = 1020;
+    const int screenHeight = 980;
+    
+    // Disable default ESC key window close behavior
+    SetConfigFlags(FLAG_VSYNC_HINT);  // NOLINT
+    
     InitWindow(screenWidth, screenHeight, "Paddle Battle");
 
     // Initialize audio device
@@ -70,11 +75,24 @@ int main(void) {
     // Load loading screen image
     Image loadingImage = LoadImage("../screenshots/screenshot002.png");  // NOLINT
     Texture2D loadingTexture = LoadTextureFromImage(loadingImage);  // NOLINT
+    SetTextureFilter(loadingTexture, TEXTURE_FILTER_BILINEAR);  // NOLINT
     UnloadImage(loadingImage);  // Unload image after texture creation  // NOLINT
+
+    // Load menu background image
+    Image menuImage = LoadImage("../screenshots/Paddle Battle menu.png");  // NOLINT
+    Texture2D menuTexture = LoadTextureFromImage(menuImage);  // NOLINT
+    SetTextureFilter(menuTexture, TEXTURE_FILTER_BILINEAR);  // NOLINT
+    UnloadImage(menuImage);  // Unload image after texture creation  // NOLINT
+
+    // Load gameplay background image (grass texture - BaseColor for realistic appearance)
+    Image gameplayImage = LoadImage("resources/BG_Space.png");  // NOLINT
+    Texture2D gameplayTexture = LoadTextureFromImage(gameplayImage);  // NOLINT
+    SetTextureFilter(gameplayTexture, TEXTURE_FILTER_BILINEAR);  // NOLINT
+    UnloadImage(gameplayImage);  // Unload image after texture creation  // NOLINT
 
     // Loading screen timer
     float loadingTimer = 0.0f;
-    float loadingDuration = 3.0f;  // 3 seconds loading  // NOLINT
+    float loadingDuration = 4.0f;  // 4 seconds loading  // NOLINT
     bool loadingAudioPlayed = false;  // Track if audio was played  // NOLINT
 
     GameScreen currentScreen = SCREEN_LOADING;
@@ -115,19 +133,36 @@ int main(void) {
 
     // selected option for menu
     static int selectedOption = 0;
+    
+    // Flag to control game loop (not just ESC key)
+    bool shouldClose = false;  // NOLINT
 
     SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
 
     // --- Main Game Loop ---
     // This loop runs 60 times a second, until you close the window
-    while (!WindowShouldClose()) {    // Detect window close button or ESC key  // NOLINT
+    while (!shouldClose) {    // Continue until user closes window via button or menu  // NOLINT
+        // Check for window close: Red X button (WindowShouldClose but filter ESC), ALT+F4, or F4 key
+        // We need to handle window close events - check if user wants to close
+        if (IsKeyDown(KEY_LEFT_ALT) && IsKeyPressed(KEY_F4)) {
+            shouldClose = true;  // ALT+F4  // NOLINT
+        }
+        if (IsKeyPressed(KEY_F4)) {
+            shouldClose = true;  // F4  // NOLINT
+        }
+        // For red X button, we use WindowShouldClose but we need to consume ESC separately
+        // Actually, we can use a workaround - check WindowShouldClose but only if not from ESC
+        bool escPressedThisFrame = IsKeyPressed(KEY_ESCAPE);  // NOLINT
+        if (WindowShouldClose() && !escPressedThisFrame) {
+            shouldClose = true;  // Window close button (red X)  // NOLINT
+        }
     // ----------------------------------------------------------------------------------
     // --- Update ---
     // This is where all your game logic (movement, input, collision) will go
     // ----------------------------------------------------------------------------------
     // Ball radius defined above
-    // paddle speed
-    float playerSpeed = 7.0f;   // NOLINT
+    // paddle speed scales with screen height for consistent gameplay across resolutions
+    float playerSpeed = (screenHeight / 450.0f) * 7.0f;  // Base speed of 7 pixels at 450px height  // NOLINT
     switch (currentScreen) {  // NOLINT
         case SCREEN_LOADING:
             // Play loading sound once
@@ -148,14 +183,14 @@ int main(void) {
             {
                 // Toggle selection with arrow keys or mouse wheel
                 if (IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W)) {
-                    selectedOption = (selectedOption - 1 + 2) % 2;
+                    selectedOption = (selectedOption - 1 + 3) % 3;  // NOLINT
                 }
                 if (IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_S)) {
-                    selectedOption = (selectedOption + 1) % 2;
+                    selectedOption = (selectedOption + 1) % 3;  // NOLINT
                 }
-                int wheelMove = GetMouseWheelMove();
+                int wheelMove = GetMouseWheelMove();  // NOLINT
                 if (wheelMove != 0) {
-                    selectedOption = (selectedOption - wheelMove + 2) % 2;
+                    selectedOption = (selectedOption - wheelMove + 3) % 3;  // NOLINT
                 }
 
                 // Select option with ENTER
@@ -173,12 +208,24 @@ int main(void) {
                         // Reset scores for new game
                         player1Score = 0;  // NOLINT
                         player2Score = 0;  // NOLINT
+                    } else if (selectedOption == 2) {
+                        shouldClose = true;  // Exit game  // NOLINT
                     }
                     // Reset game timer
                     gameTimer = 0.0f;  // NOLINT
                 }
+                
+                // ESC to close game from menu
+                if (IsKeyPressed(KEY_ESCAPE)) {
+                    shouldClose = true;  // Close window  // NOLINT
+                }
             } break;
         case SCREEN_GAMEPLAY:
+            // Check for pause (ESC key)
+            if (IsKeyPressed(KEY_ESCAPE)) {
+                currentScreen = SCREEN_PAUSE;
+            }
+
             // player 1 controls
             if (IsKeyDown(KEY_W) && player1.y > 0)
                 player1.y -= playerSpeed;  // Move paddle up
@@ -276,6 +323,21 @@ int main(void) {
             }
 
             break;
+        case SCREEN_PAUSE:
+            // Pause screen logic
+            if (IsKeyPressed(KEY_ESCAPE)) {
+                currentScreen = SCREEN_GAMEPLAY;  // Resume game
+            }
+            if (IsKeyPressed(KEY_ENTER)) {
+                currentScreen = SCREEN_MENU;  // Return to menu
+                // Reset game state
+                player1Score = 0;  // NOLINT
+                player2Score = 0;  // NOLINT
+                gameTimer = 0.0f;  // NOLINT
+                ballSpeedTimer = 0.0f;  // NOLINT
+                winner = 0;  // NOLINT
+            }
+            break;
         case SCREEN_ENDING:
             // Ending screen logic
             if (IsKeyPressed(KEY_ENTER)) {
@@ -334,18 +396,39 @@ int main(void) {
                 DrawText(progressText, screenWidth / 2 - 15, progressY + 50, 15, LIGHTGRAY);
                 break;
             case SCREEN_MENU:
-                DrawText("MY PONG GAME", screenWidth / 2 - 150, screenHeight / 2 - 80, 40, LIGHTGRAY);
-               // draw indicator - highlight the selected option
+                // Draw menu background image with aspect ratio preserved
+                float menuScaleX = (float)screenWidth / menuTexture.width;  // NOLINT
+                float menuScaleY = (float)screenHeight / menuTexture.height;  // NOLINT
+                float menuScale = (menuScaleX < menuScaleY) ? menuScaleX : menuScaleY;  // NOLINT
+                DrawTextureEx(menuTexture, (Vector2){ 0, 0 }, 0.0f, menuScale, WHITE);  // NOLINT
+
+                // Draw semi-transparent overlay for text readability
+                DrawRectangle(0, 0, screenWidth, screenHeight, Fade(BLACK, 0.4f));
+
+                // Draw menu options with text - highlight the selected option
                 if (selectedOption == 0) {
-                    DrawText("1. Player vs Player", screenWidth / 2 - 100, screenHeight / 2 - 30, 15, YELLOW);
-                    DrawText("2. Player vs AI", screenWidth / 2 - 100, screenHeight / 2 - 10, 15, LIGHTGRAY);
+                    DrawText("1. Player vs Player", screenWidth / 2 - 150, screenHeight / 2 - 60, 30, YELLOW);  // NOLINT
+                    DrawText("2. Player vs AI", screenWidth / 2 - 150, screenHeight / 2 - 10, 30, LIGHTGRAY);  // NOLINT
+                    DrawText("3. Exit", screenWidth / 2 - 150, screenHeight / 2 + 40, 30, LIGHTGRAY);  // NOLINT
                 } else if (selectedOption == 1) {
-                    DrawText("1. Player vs Player", screenWidth / 2 - 100, screenHeight / 2 - 30, 15, LIGHTGRAY);
-                    DrawText("2. Player vs AI", screenWidth / 2 - 100, screenHeight / 2 - 10, 15, YELLOW);
+                    DrawText("1. Player vs Player", screenWidth / 2 - 150, screenHeight / 2 - 60, 30, LIGHTGRAY);  // NOLINT
+                    DrawText("2. Player vs AI", screenWidth / 2 - 150, screenHeight / 2 - 10, 30, YELLOW);  // NOLINT
+                    DrawText("3. Exit", screenWidth / 2 - 150, screenHeight / 2 + 40, 30, LIGHTGRAY);  // NOLINT
+                } else if (selectedOption == 2) {
+                    DrawText("1. Player vs Player", screenWidth / 2 - 150, screenHeight / 2 - 60, 30, LIGHTGRAY);  // NOLINT
+                    DrawText("2. Player vs AI", screenWidth / 2 - 150, screenHeight / 2 - 10, 30, LIGHTGRAY);  // NOLINT
+                    DrawText("3. Exit", screenWidth / 2 - 150, screenHeight / 2 + 40, 30, YELLOW);  // NOLINT
                 }
-                DrawText("Created by Duvindu Dinethmin Devendra", screenWidth / 2 - 130, screenHeight - 40, 10, GRAY);
+            DrawText("Created by Duvindu Dinethmin Devendra", screenWidth / 2 - 200, screenHeight - 20, 20, LIGHTGRAY);  // NOLINT
                 break;
             case SCREEN_GAMEPLAY:
+                // Draw gameplay background (grass texture tiled for realistic surface)
+                for (int y = 0; y < screenHeight; y += gameplayTexture.height) {
+                    for (int x = 0; x < screenWidth; x += gameplayTexture.width) {
+                        DrawTexture(gameplayTexture, x, y, WHITE);  // NOLINT
+                    }
+                }
+
                 // Draw paddles
                 DrawRectangleRec(player1, RED);
                 DrawRectangleRec(player2, YELLOW);
@@ -364,6 +447,17 @@ int main(void) {
                 char timerText[20];
                 sprintf(timerText, "Time: %.2f", gameTimer);  // NOLINT
                 DrawText(timerText, screenWidth / 2 - 40, 20, 20, GREEN);
+                break;
+            case SCREEN_PAUSE:
+                // Draw semi-transparent overlay for pause
+                DrawRectangle(0, 0, screenWidth, screenHeight, Fade(BLACK, 0.7f));
+
+                // Draw pause text
+                DrawText("GAME PAUSED", screenWidth / 2 - 120, screenHeight / 2 - 60, 40, YELLOW);
+
+                // Draw instructions
+                DrawText("Press ESC to Resume", screenWidth / 2 - 110, screenHeight / 2 + 20, 20, LIGHTGRAY);
+                DrawText("Press ENTER to Return to Menu", screenWidth / 2 - 150, screenHeight / 2 + 60, 20, LIGHTGRAY);
                 break;
             case SCREEN_ENDING:
                 // Display winner message
@@ -396,6 +490,8 @@ int main(void) {
 
     // --- De-Initialization ---
     UnloadTexture(loadingTexture);  // Unload loading screen texture  // NOLINT
+    UnloadTexture(menuTexture);     // Unload menu background texture  // NOLINT
+    UnloadTexture(gameplayTexture); // Unload gameplay background texture  // NOLINT
     UnloadSound(paddleHitSound);  // Unload paddle hit sound  // NOLINT
     UnloadSound(wallHitSound);    // Unload wall hit sound  // NOLINT
     UnloadSound(loadingSound);    // Unload loading sound  // NOLINT
