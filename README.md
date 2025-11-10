@@ -140,7 +140,7 @@ The following features are planned for future development:
 ![Gameplay](screenshots/screenshot002.png "Paddle Battle - Player vs AI Gameplay")
 
 **Pause Menu**
-![Pause Screen](screenshots/pause_screen.png "Paddle Battle - Pause Menu")
+![Pause Screen](screenshots/Screenshot 2025-11-11 014421.png "Paddle Battle - Pause Menu")
 
 **Game Features in Action:**
 - Two-player competitive gameplay with real-time score tracking
