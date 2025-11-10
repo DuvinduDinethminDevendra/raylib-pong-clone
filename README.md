@@ -67,13 +67,59 @@ A simple yet classic Pong clone created with raylib in plain C. This is a beginn
 
 ### Features
 
- - Two-player gameplay (Player vs Player)
- - Interactive menu system with selection indicator
- - Smooth paddle controls with boundary detection
- - Ball physics with wall and paddle collision
- - Ball reset to center when out of bounds
- - Menu navigation with keyboard and mouse wheel support
- - Coming Soon: Player vs AI mode
+ - **Two-player gameplay (Player vs Player)** - Classic head-to-head Pong
+ - **Player vs AI mode** - Challenge the computer opponent with adaptive AI
+ - **Interactive menu system** - Navigate with keyboard/mouse wheel and select game mode
+ - **Point counter system** - Track scores for both players (first to 5 points wins)
+ - **Smooth paddle controls** - WASD and Arrow keys with boundary detection
+ - **Ball physics** - Realistic collision detection with paddles and walls
+ - **Color-coded visuals** - Red paddle/player 1, Yellow paddle/player 2
+ - **Sound effects** - Audio feedback for paddle hits, wall bounces, and scoring
+ - **Victory screen** - Display winner and final scores with replay option
+
+### Controls
+
+Keyboard:
+ - **W / UP Arrow** - Move paddle up
+ - **S / DOWN Arrow** - Move paddle down
+ - **ENTER** - Confirm menu selection and start game
+ - **ESC** - Close game window
+
+Mouse:
+ - **Mouse Wheel** - Navigate menu options
+
+### Future Features / Next Steps
+
+The following features are planned for future development:
+
+1. **Options Menu Screen**
+   - Add a new `SCREEN_OPTIONS` state to the GameScreen enum
+   - Implement settings such as:
+     - **Sound Volume Control** - Adjust master volume, SFX, and music separately
+     - **Difficulty Levels** - Easy, Medium, Hard for AI opponent
+     - **Ball Speed** - Adjust ball movement speed
+     - **Game Modes** - Toggle fullscreen, resolution options
+   - Add navigation and slider/toggle UI elements
+   - Return to main menu option
+
+2. **AI Difficulty Levels**
+   - Implement multiple AI skill levels affecting paddle speed and reaction time
+   - Easy: Slower AI with larger deadzone
+   - Medium: Default AI behavior
+   - Hard: Faster AI with perfect ball tracking
+
+3. **Pause Menu**
+   - Add pause functionality during gameplay (P key or ESC)
+   - Display pause screen with resume/quit options
+
+4. **Background Music**
+   - Add background track during menu and gameplay
+   - Implement music volume control via options menu
+
+5. **Enhanced Graphics**
+   - Add sprites for paddles and ball
+   - Implement particle effects on collisions
+   - Add animated menu transitions
 
 ### Controls
 
@@ -105,4 +151,4 @@ This game sources are licensed under an unmodified zlib/libpng license, which is
 
 $(Additional Licenses)
 
-*Copyright (c) $(Year) $(User Name) ($(User Twitter/GitHub Name))*
+*Copyright (c) $(2025) $(B.D.D.Devendra) ($(DuvinduDinethminDevendra))*
