@@ -134,13 +134,13 @@ The following features are planned for future development:
 ### Screenshots
 
 **Main Menu with 3 Options**
-![Main Menu](screenshots/Paddle%20Battle%20menu.png "Paddle Battle - Main Menu with Player vs Player, Player vs AI, and Exit options")
+![Main Menu](screenshots/Screenshot%202025-11-10%20223709.png "Paddle Battle - Main Menu with Player vs Player, Player vs AI, and Exit options")
 
 **Gameplay - Space-themed Arena**
-![Gameplay](screenshots/screenshot002.png "Paddle Battle - Player vs AI Gameplay")
+![Gameplay](screenshots/Screenshot%202025-11-11%20014350.png "Paddle Battle - Player vs AI Gameplay")
 
 **Pause Menu**
-![Pause Screen](screenshots/Screenshot 2025-11-11 014421.png "Paddle Battle - Pause Menu")
+![Pause Screen](screenshots/Screenshot%202025-11-11%20014421.png "Paddle Battle - Pause Menu")
 
 **Game Features in Action:**
 - Two-player competitive gameplay with real-time score tracking
