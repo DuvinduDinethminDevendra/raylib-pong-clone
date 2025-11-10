@@ -68,7 +68,7 @@ int main(void) {
     Sound speedIncreaseSound = LoadSound("resources/coin.wav");  // Speed increase sound  // NOLINT
 
     // Load loading screen image
-    Image loadingImage = LoadImage("screenshots/screenshot001.png");  // NOLINT
+    Image loadingImage = LoadImage("../screenshots/screenshot002.png");  // NOLINT
     Texture2D loadingTexture = LoadTextureFromImage(loadingImage);  // NOLINT
     UnloadImage(loadingImage);  // Unload image after texture creation  // NOLINT
 
@@ -302,8 +302,10 @@ int main(void) {
 
         switch (currentScreen) {  // NOLINT
             case SCREEN_LOADING:
-                // Draw loading screen image
-                DrawTexture(loadingTexture, 0, 0, WHITE);
+                // Draw loading screen image scaled to screen size (fill entire screen)
+                float scaleX = (float)screenWidth / loadingTexture.width;  // NOLINT
+                DrawTextureEx(loadingTexture, (Vector2){ 0, 0 }, 0.0f,  // NOLINT
+                              scaleX, WHITE);
 
                 // Draw semi-transparent overlay with loading text
                 DrawRectangle(0, 0, screenWidth, screenHeight, Fade(BLACK, 0.3f));
