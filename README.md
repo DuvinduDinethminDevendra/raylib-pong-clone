@@ -69,24 +69,37 @@ A simple yet classic Pong clone created with raylib in plain C. **Paddle Battle*
 
  - **Two-player gameplay (Player vs Player)** - Classic head-to-head Pong
  - **Player vs AI mode** - Challenge the computer opponent with adaptive AI
+ - **Exit menu option** - Easy game termination from main menu
  - **Interactive menu system** - Navigate with keyboard/mouse wheel and select game mode
  - **Point counter system** - Track scores for both players (first to 5 points wins)
  - **Smooth paddle controls** - WASD and Arrow keys with boundary detection
- - **Ball physics** - Realistic collision detection with paddles and walls
+ - **Resolution-adaptive gameplay** - Paddle speed and AI scale with screen resolution
+ - **Ball physics** - Realistic collision detection with paddles and walls with speed progression
  - **Color-coded visuals** - Red paddle/player 1, Yellow paddle/player 2
  - **Sound effects** - Audio feedback for paddle hits, wall bounces, and scoring
  - **Victory screen** - Display winner and final scores with replay option
+ - **Pause menu** - Press ESC during gameplay to pause, with resume/menu options
+ - **Loading screen** - 3-second loading screen with progress bar and audio
+ - **Beautiful space-themed UI** - Cyberpunk aesthetics with textured backgrounds
+ - **Bilinear texture filtering** - Smooth image scaling on all backgrounds
 
 ### Controls
 
-Keyboard:
+**Menu Navigation:**
+ - **UP Arrow / W** - Select previous option
+ - **DOWN Arrow / S** - Select next option
+ - **Mouse Wheel** - Scroll through menu options
+ - **ENTER** - Confirm selection
+
+**Gameplay Controls:**
  - **W / UP Arrow** - Move paddle up
  - **S / DOWN Arrow** - Move paddle down
- - **ENTER** - Confirm menu selection and start game
- - **ESC** - Close game window
+ - **ESC** - Pause game (opens pause menu)
 
-Mouse:
- - **Mouse Wheel** - Navigate menu options
+**Window Management:**
+ - **ESC from menu** - Exit game
+ - **Red X button** - Close game
+ - **ALT+F4** - Close game
 
 ### Future Features / Next Steps
 
@@ -108,34 +121,34 @@ The following features are planned for future development:
    - Medium: Default AI behavior
    - Hard: Faster AI with perfect ball tracking
 
-3. **Pause Menu**
-   - Add pause functionality during gameplay (P key or ESC)
-   - Display pause screen with resume/quit options
-
-4. **Background Music**
+3. **Background Music**
    - Add background track during menu and gameplay
    - Implement music volume control via options menu
 
- - **Enhanced Graphics**
+4. **Enhanced Graphics**
    - Add sprites for paddles and ball
    - Implement particle effects on collisions
    - Add animated menu transitions
+   - Add ball trail effect
 
 ### Screenshots
 
+**Main Menu with 3 Options**
+![Main Menu](screenshots/Paddle%20Battle%20menu.png "Paddle Battle - Main Menu with Player vs Player, Player vs AI, and Exit options")
 
-**Main Menu**
-![Main Menu](screenshots/Screenshot%202025-11-10%20223709.png "Paddle Battle - Player vs AI Mode")
+**Gameplay - Space-themed Arena**
+![Gameplay](screenshots/screenshot002.png "Paddle Battle - Player vs AI Gameplay")
 
+**Pause Menu**
+![Pause Screen](screenshots/pause_screen.png "Paddle Battle - Pause Menu")
 
-**Gameplay - Player vs AI End Screen**
-![End Screen](screenshots/Screenshot%202025-11-10%20223614.png "Menu Screen with Game Mode Selection")
-
-**Gameplay Video**
-
-[Watch the gameplay video](screenshots/Recording%202025-11-10%20223847.mp4)
-
-[![Paddle Battle Gameplay](https://img.shields.io/badge/Video-Gameplay%20Demo-blue)](screenshots/Recording%202025-11-10%20223847.mp4)
+**Game Features in Action:**
+- Two-player competitive gameplay with real-time score tracking
+- AI opponent with adaptive paddle positioning
+- Smooth collision physics and ball movement
+- Color-coded players (Red vs Yellow)
+- Menu-driven game mode selection
+- Pause/Resume functionality during gameplay
 
 ### Developers
 
