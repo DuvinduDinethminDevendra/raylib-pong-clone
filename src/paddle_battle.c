@@ -368,9 +368,9 @@ int main(void) {
             case SCREEN_ENDING:
                 // Display winner message
                 if (winner == 1) {
-                    DrawText("PLAYER 1 WINS!", screenWidth / 2 - 120, screenHeight / 2 - 60, 40, RED);
+                    DrawText("PLAYER 1 WINS!", screenWidth / 2 - 180, screenHeight / 2 - 60, 40, RED);
                 } else if (winner == 2) {
-                    DrawText("PLAYER 2 WINS!", screenWidth / 2 - 120, screenHeight / 2 - 60, 40, YELLOW);
+                    DrawText("PLAYER 2 WINS!", screenWidth / 2 - 180, screenHeight / 2 - 60, 40, YELLOW);
                 }
 
                 // Display final scores

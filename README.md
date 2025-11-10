@@ -123,7 +123,19 @@ The following features are planned for future development:
 
 ### Screenshots
 
-_TODO: Show your game to the world, animated GIFs recommended!._
+
+**Main Menu**
+![Main Menu](screenshots/Screenshot%202025-11-10%20223709.png "Paddle Battle - Player vs AI Mode")
+
+
+**Gameplay - Player vs AI End Screen**
+![End Screen](screenshots/Screenshot%202025-11-10%20223614.png "Menu Screen with Game Mode Selection")
+
+**Gameplay Video**
+
+[Watch the gameplay video](screenshots/Recording%202025-11-10%20223847.mp4)
+
+[![Paddle Battle Gameplay](https://img.shields.io/badge/Video-Gameplay%20Demo-blue)](screenshots/Recording%202025-11-10%20223847.mp4)
 
 ### Developers
 
