@@ -94,6 +94,8 @@ int main(void) {
     // Score tracking
     int player1Score = 0;  // Player 1 (left paddle) score  // NOLINT
     int player2Score = 0;  // Player 2 (right paddle) score  // NOLINT
+    int winPoints = 5;    // Points needed to win  // NOLINT
+    int winner = 0;       // Winner: 0 = none, 1 = player1, 2 = player2  // NOLINT
 
     // selected option for menu
     static int selectedOption = 0;
@@ -206,14 +208,25 @@ int main(void) {
                 ballPosition.x = screenWidth / 2.0f;
                 ballPosition.y = screenHeight / 2.0f;
                 ballColor = WHITE;  // Reset ball color  // NOLINT
+
+                // Check for winner (first to 5 points)
+                if (player1Score >= winPoints) {
+                    winner = 1;  // Player 1 wins  // NOLINT
+                    currentScreen = ENDING;
+                } else if (player2Score >= winPoints) {
+                    winner = 2;  // Player 2 wins  // NOLINT
+                    currentScreen = ENDING;
+                }
             }
             break;
         case ENDING:
-            // Ending screen logic (if any)
-            DrawText("THANK YOU FOR PLAYING!", screenWidth / 2 - 100, screenHeight / 2 - 20, 20, LIGHTGRAY);
-            DrawText("PRESS ENTER TO RETURN TO MENU", screenWidth / 2 - 150, screenHeight / 2 + 10, 20, LIGHTGRAY);
+            // Ending screen logic
             if (IsKeyPressed(KEY_ENTER)) {
                 currentScreen = SCREEN_MENU;
+                // Reset scores and winner for next game
+                player1Score = 0;  // NOLINT
+                player2Score = 0;  // NOLINT
+                winner = 0;        // NOLINT
             }
             break;
         default:
@@ -258,8 +271,22 @@ int main(void) {
                 DrawText(scoreText2, screenWidth - 180, 20, 20, YELLOW);
                 break;
             case ENDING:
-                DrawText("THANK YOU FOR PLAYING!", screenWidth / 2 - 100, screenHeight / 2 - 20, 20, LIGHTGRAY);
-                DrawText("PRESS ENTER TO RETURN TO MENU", screenWidth / 2 - 150, screenHeight / 2 + 10, 20, LIGHTGRAY);
+                // Display winner message
+                if (winner == 1) {
+                    DrawText("PLAYER 1 WINS!", screenWidth / 2 - 120, screenHeight / 2 - 60, 40, RED);
+                } else if (winner == 2) {
+                    DrawText("PLAYER 2 WINS!", screenWidth / 2 - 120, screenHeight / 2 - 60, 40, YELLOW);
+                }
+
+                // Display final scores
+                char finalScore1[30];
+                char finalScore2[30];
+                sprintf(finalScore1, "Final Score - Player 1: %d", player1Score);  // NOLINT
+                sprintf(finalScore2, "Final Score - Player 2: %d", player2Score);  // NOLINT
+                DrawText(finalScore1, screenWidth / 2 - 150, screenHeight / 2, 20, RED);
+                DrawText(finalScore2, screenWidth / 2 - 150, screenHeight / 2 + 30, 20, YELLOW);
+
+                DrawText("PRESS ENTER TO RETURN TO MENU", screenWidth / 2 - 180, screenHeight / 2 + 80, 20, LIGHTGRAY);
                 break;
 
             default:
