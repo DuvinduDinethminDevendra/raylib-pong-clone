@@ -55,7 +55,7 @@ int main(void) {
     // --- Initialization ---
     const int screenWidth = 800;
     const int screenHeight = 450;
-    InitWindow(screenWidth, screenHeight, "My Pong Game");
+    InitWindow(screenWidth, screenHeight, "Paddle Battle");
 
     // Initialize audio device
     InitAudioDevice();  // NOLINT

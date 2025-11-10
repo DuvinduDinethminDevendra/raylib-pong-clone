@@ -29,11 +29,11 @@
 PLATFORM              ?= PLATFORM_DESKTOP
 
 # Define project variables
-PROJECT_NAME          ?= raylib_game
+PROJECT_NAME          ?= paddle_battle
 PROJECT_VERSION       ?= 1.0
 PROJECT_BUILD_PATH    ?= .
 PROJECT_SOURCE_FILES  ?= \
-    raylib_game.c 
+    paddle_battle.c 
 
 # raylib library variables
 RAYLIB_SRC_PATH       ?= C:\raylib\raylib\src

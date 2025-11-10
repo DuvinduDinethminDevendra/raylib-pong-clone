@@ -59,11 +59,11 @@ cmake --build build
 
 ## My First Pong Game
 
-![My First Pong Game](screenshots/screenshot000.png "My First Pong Game")
+![My First Pong Game](screenshots/screenshot000.png "Paddle Battle")
 
 ### Description
 
-A simple yet classic Pong clone created with raylib in plain C. This is a beginner-friendly implementation of the iconic arcade game, featuring two-player gameplay with responsive paddle controls and realistic ball physics. The game includes a menu system for selecting game modes and a complete game loop with collision detection and ball bounce mechanics.
+A simple yet classic Pong clone created with raylib in plain C. **Paddle Battle** is a beginner-friendly implementation of the iconic arcade game, featuring two-player gameplay with responsive paddle controls and realistic ball physics. The game includes a menu system for selecting game modes and a complete game loop with collision detection and ball bounce mechanics.
 
 ### Features
 
@@ -116,21 +116,10 @@ The following features are planned for future development:
    - Add background track during menu and gameplay
    - Implement music volume control via options menu
 
-5. **Enhanced Graphics**
+ - **Enhanced Graphics**
    - Add sprites for paddles and ball
    - Implement particle effects on collisions
    - Add animated menu transitions
-
-### Controls
-
-Keyboard:
- - **W / UP Arrow** - Move paddle up
- - **S / DOWN Arrow** - Move paddle down
- - **ENTER** - Confirm menu selection and start game
- - **ESC** - Close game window
-
-Mouse:
- - **Mouse Wheel** - Navigate menu options
 
 ### Screenshots
 
@@ -149,6 +138,4 @@ _TODO: Show your game to the world, animated GIFs recommended!._
 
 This game sources are licensed under an unmodified zlib/libpng license, which is an OSI-certified, BSD-like license that allows static linking with closed source software. Check [LICENSE](LICENSE) for further details.
 
-$(Additional Licenses)
-
-*Copyright (c) $(2025) $(B.D.D.Devendra) ($(DuvinduDinethminDevendra))*
+*Copyright (c) 2025 Duvindu Dinethmin Devendra*
