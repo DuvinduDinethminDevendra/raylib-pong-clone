@@ -13,17 +13,16 @@
 
 // states
 typedef enum GameScreen {   // NOLINT
-    LOGO = 0,
-    TITLE,
+    SCREEN_LOADING = 0,
     SCREEN_MENU,
     SCREEN_GAMEPLAY,
-    ENDING } GameScreen;
+    SCREEN_ENDING } GameScreen;
 
 // Game modes
 typedef enum GameMode {  // NOLINT
     PVP = 0,     // Player vs Player
     PVAI = 1 }   // Player vs AI
-GameMode;
+    GameMode;
 
 //----------------------------------------------------------------------------------
 // AI Function - Makes the AI paddle track the ball
@@ -65,8 +64,20 @@ int main(void) {
     Sound wallHitSound = LoadSound("resources/wall_hit.wav");  // NOLINT
     Sound ballMissSound = LoadSound("resources/mixkit-funny-game-over-2878.wav");  // NOLINT
     Sound pointMadeSound = LoadSound("resources/coin.wav");  // NOLINT
+    Sound loadingSound = LoadSound("resources/mixkit-golf-ball-bouncing-2075.wav");  // NOLINT
+    Sound speedIncreaseSound = LoadSound("resources/coin.wav");  // Speed increase sound  // NOLINT
 
-    GameScreen currentScreen = SCREEN_MENU;
+    // Load loading screen image
+    Image loadingImage = LoadImage("screenshots/screenshot001.png");  // NOLINT
+    Texture2D loadingTexture = LoadTextureFromImage(loadingImage);  // NOLINT
+    UnloadImage(loadingImage);  // Unload image after texture creation  // NOLINT
+
+    // Loading screen timer
+    float loadingTimer = 0.0f;
+    float loadingDuration = 3.0f;  // 3 seconds loading  // NOLINT
+    bool loadingAudioPlayed = false;  // Track if audio was played  // NOLINT
+
+    GameScreen currentScreen = SCREEN_LOADING;
 
     // Game mode tracking
     GameMode gameMode = PVP;  // Start with Player vs Player  // NOLINT
@@ -77,6 +88,11 @@ int main(void) {
     player1.x = 50;
     player1.y = screenHeight / 2 - player1.height / 2;  // Center paddle vertically  // NOLINT
     
+    // Timer
+    float gameTimer = 0.0f;  // NOLINT
+    float ballSpeedTimer = 0.0f;  // Timer for ball speed increase  // NOLINT
+
+
     // Define the opponent paddle (right side)  // NOLINT
     Rectangle player2 = { screenWidth - 70, screenHeight/2 - 40, 10, 80 };  // Right paddle  // NOLINT
     player2.width = 20;
@@ -113,6 +129,21 @@ int main(void) {
     // paddle speed
     float playerSpeed = 7.0f;   // NOLINT
     switch (currentScreen) {  // NOLINT
+        case SCREEN_LOADING:
+            // Play loading sound once
+            if (!loadingAudioPlayed) {
+                PlaySound(loadingSound);  // NOLINT
+                loadingAudioPlayed = true;  // NOLINT
+            }
+
+            // Update loading timer
+            loadingTimer += GetFrameTime();  // NOLINT
+
+            // Transition to menu after loading duration
+            if (loadingTimer >= loadingDuration) {
+                currentScreen = SCREEN_MENU;
+            }
+            break;
         case SCREEN_MENU:
             {
                 // Toggle selection with arrow keys or mouse wheel
@@ -135,6 +166,7 @@ int main(void) {
                         // Reset scores for new game
                         player1Score = 0;  // NOLINT
                         player2Score = 0;  // NOLINT
+                        // Reset game timer
                     } else if (selectedOption == 1) {
                         gameMode = PVAI;  // Set to Player vs AI  // NOLINT
                         currentScreen = SCREEN_GAMEPLAY;
@@ -142,6 +174,8 @@ int main(void) {
                         player1Score = 0;  // NOLINT
                         player2Score = 0;  // NOLINT
                     }
+                    // Reset game timer
+                    gameTimer = 0.0f;  // NOLINT
                 }
             } break;
         case SCREEN_GAMEPLAY:
@@ -196,36 +230,60 @@ int main(void) {
                     WaitTime(0.7f);  // Brief pause after scoring  // NOLINT
                     player2Score++;  // Ball went left, player 2 scores  // NOLINT
                     PlaySound(pointMadeSound);  // Play point made sound  // NOLINT
+                    gameTimer = 0.0f;  // NOLINT // Reset timer when player 2 scores
+                    // Do not reset ballSpeedTimer here
 
                 } else {
                     PlaySound(ballMissSound);  // Play ball miss sound  // NOLINT
                     WaitTime(0.7f);  // Brief pause after scoring  // NOLINT
                     player1Score++;  // Ball went right, player 1 scores  // NOLINT
                     PlaySound(pointMadeSound);  // Play point made sound  // NOLINT
+                    gameTimer = 0.0f;  // NOLINT // Reset timer when player 1 scores
                 }
-
                 // Reset ball position to center
                 ballPosition.x = screenWidth / 2.0f;
                 ballPosition.y = screenHeight / 2.0f;
                 ballColor = WHITE;  // Reset ball color  // NOLINT
+                // Reset ball speed after each round to initial values
+                ballSpeed.x = 5.0f;
+                ballSpeed.y = 5.0f;
 
                 // Check for winner (first to 5 points)
                 if (player1Score >= winPoints) {
                     winner = 1;  // Player 1 wins  // NOLINT
-                    currentScreen = ENDING;
+                    currentScreen = SCREEN_ENDING;
                 } else if (player2Score >= winPoints) {
                     winner = 2;  // Player 2 wins  // NOLINT
-                    currentScreen = ENDING;
+                    currentScreen = SCREEN_ENDING;
                 }
+                ballSpeed.x *= 1.1f;
+                ballSpeed.y *= 1.1f;
+                // Cap the maximum speed to prevent the ball from becoming too fast
+                float maxSpeed = 15.0f;
+                if (ballSpeed.x > maxSpeed) ballSpeed.x = maxSpeed;
+                if (ballSpeed.x < -maxSpeed) ballSpeed.x = -maxSpeed;
+                if (ballSpeed.y > maxSpeed) ballSpeed.y = maxSpeed;
+                if (ballSpeed.y < -maxSpeed) ballSpeed.y = -maxSpeed;
+                gameTimer = 0.0f;  // Reset timer after speed increase
             }
+            // increase ball speed every 10 seconds
+            ballSpeedTimer += GetFrameTime();  // NOLINT
+            if (ballSpeedTimer > 10.0f) {
+                ballSpeed.x *= 1.1f;
+                ballSpeed.y *= 1.1f;
+                PlaySound(speedIncreaseSound);  // Play sound when speed increases  // NOLINT
+                ballSpeedTimer = 0.0f;  // Reset ball speed timer after speed increase
+            }
+
             break;
-        case ENDING:
+        case SCREEN_ENDING:
             // Ending screen logic
             if (IsKeyPressed(KEY_ENTER)) {
                 currentScreen = SCREEN_MENU;
                 // Reset scores and winner for next game
                 player1Score = 0;  // NOLINT
                 player2Score = 0;  // NOLINT
+                gameTimer = 0.0f;  // NOLINT
                 winner = 0;        // NOLINT
             }
             break;
@@ -243,6 +301,36 @@ int main(void) {
             ClearBackground(BLACK);
 
         switch (currentScreen) {  // NOLINT
+            case SCREEN_LOADING:
+                // Draw loading screen image
+                DrawTexture(loadingTexture, 0, 0, WHITE);
+
+                // Draw semi-transparent overlay with loading text
+                DrawRectangle(0, 0, screenWidth, screenHeight, Fade(BLACK, 0.3f));
+
+                // Draw "LOADING..." text
+                DrawText("LOADING...", screenWidth / 2 - 80, screenHeight / 2 - 30, 40, WHITE);
+
+                // Draw progress bar
+                int progressBarWidth = 200;
+                int progressBarHeight = 20;
+                int progressX = screenWidth / 2 - progressBarWidth / 2;
+                int progressY = screenHeight / 2 + 40;
+                float progress = loadingTimer / loadingDuration;  // NOLINT
+
+                // Draw progress bar background
+                DrawRectangle(progressX, progressY, progressBarWidth, progressBarHeight, DARKGRAY);
+
+                // Draw progress bar fill
+                int progressFill = (int)(progressBarWidth * progress);  // NOLINT
+                DrawRectangle(progressX, progressY, progressFill,
+                              progressBarHeight, YELLOW);
+
+                // Draw percentage text
+                char progressText[10];
+                sprintf(progressText, "%d%%", (int)(progress * 100));  // NOLINT
+                DrawText(progressText, screenWidth / 2 - 15, progressY + 50, 15, LIGHTGRAY);
+                break;
             case SCREEN_MENU:
                 DrawText("MY PONG GAME", screenWidth / 2 - 150, screenHeight / 2 - 80, 40, LIGHTGRAY);
                // draw indicator - highlight the selected option
@@ -269,8 +357,13 @@ int main(void) {
                 sprintf(scoreText2, "Player 2: %d", player2Score);  // NOLINT
                 DrawText(scoreText1, 20, 20, 20, RED);
                 DrawText(scoreText2, screenWidth - 180, 20, 20, YELLOW);
+                // Update and display game timer
+                gameTimer += GetFrameTime();  // NOLINT
+                char timerText[20];
+                sprintf(timerText, "Time: %.2f", gameTimer);  // NOLINT
+                DrawText(timerText, screenWidth / 2 - 40, 20, 20, GREEN);
                 break;
-            case ENDING:
+            case SCREEN_ENDING:
                 // Display winner message
                 if (winner == 1) {
                     DrawText("PLAYER 1 WINS!", screenWidth / 2 - 120, screenHeight / 2 - 60, 40, RED);
@@ -300,8 +393,11 @@ int main(void) {
     }
 
     // --- De-Initialization ---
+    UnloadTexture(loadingTexture);  // Unload loading screen texture  // NOLINT
     UnloadSound(paddleHitSound);  // Unload paddle hit sound  // NOLINT
     UnloadSound(wallHitSound);    // Unload wall hit sound  // NOLINT
+    UnloadSound(loadingSound);    // Unload loading sound  // NOLINT
+    UnloadSound(speedIncreaseSound);  // Unload speed increase sound  // NOLINT
     CloseAudioDevice();           // Close audio device  // NOLINT
     CloseWindow();        // Close window and OpenGL context
 
